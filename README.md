@@ -33,18 +33,6 @@ Creating a Resource Group in Azure: <br/>
 Configuring Network Security Groups (NSGs):  <br/>
 <img src="https://imgur.com/3Ze8Dbx.png" height="80%" width="80%" alt="NSG Configuration"/>
 <br />
-<br />
-Remote Connection via SSH/RDP: <br/>
-<img src="https://i.imgur.com/nCIbXbg.png" height="80%" width="80%" alt="Remote Access Setup"/>
-<br />
-<br />
-Analyzing Network Traffic in Wireshark:  <br/>
-<img src="https://i.imgur.com/cdFHBiU.png" height="80%" width="80%" alt="Wireshark Analysis"/>
-<br />
-<br />
-Monitoring Logs & Alerts in Azure:  <br/>
-<img src="https://i.imgur.com/JL945Ga.png" height="80%" width="80%" alt="Azure Logs & Monitoring"/>
-</p>
 
 <h2>Step-by-Step Deployment Guide</h2>
 
