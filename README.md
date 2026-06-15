@@ -1,98 +1,121 @@
-<h1>Microsoft Azure - Virtual Machines, Network Security Groups & Packet Analysis</h1>
+# Microsoft Azure VM, NSG, and Packet Analysis Lab
 
-<h2>Description</h2>
-This repository documents the setup and configuration of **Microsoft Azure Virtual Machines (VMs)**, **Network Security Groups (NSGs)**, and the monitoring of network traffic using **Wireshark**. The project demonstrates how to deploy a cloud-based infrastructure with secure network policies and packet-level analysis to enhance security and performance tracking.  
-<br />
+I built this lab to practice the basics of running a virtual machine in Azure and controlling how traffic reaches it. The main focus was not just "create a VM," but understanding what sits around it: the resource group, virtual network, subnet, public IP, network interface, and Network Security Group rules.
 
-<h2>Key Features & Configurations</h2>
+![Azure VM and NSG lab map](assets/azure-vm-nsg-lab-map.png)
 
-- <b>Virtual Machine Deployment:</b> Configured Windows and Linux-based VMs in Azure.
-- <b>Network Security Groups (NSGs):</b> Implemented inbound/outbound rules for controlled access.
-- <b>Remote Access Configuration:</b> Configured SSH & RDP access for secure remote management.
-- <b>Firewall & Port Restrictions:</b> Enforced security policies using Azure Firewall & NSG rules.
-- <b>Packet Capture & Network Monitoring:</b> Used **Wireshark** to analyze network traffic.
-- <b>Logging & Analytics:</b> Enabled Azure Network Watcher to track security and connectivity insights.
+## My Goal
 
-<h2>Environments Used</h2>
+My goal was to deploy a cloud virtual machine, control remote access with NSG rules, and use packet analysis to understand what traffic looks like when a machine is reachable over the network.
 
-- <b>Microsoft Azure Portal</b> (Cloud Infrastructure)
-- <b>Windows Server 2022</b> (Deployed VM)
-- <b>Ubuntu 20.04 LTS</b> (Linux-based VM)
-- <b>Wireshark</b> (Network Packet Analyzer)
+The specific things I wanted to practice were:
 
-<h2>Project Walkthrough:</h2>
+- Creating an Azure resource group
+- Deploying a Windows or Linux virtual machine
+- Understanding the virtual network and subnet created with the VM
+- Configuring Network Security Group rules for RDP or SSH
+- Testing remote access
+- Using Wireshark to observe traffic behavior
 
-<p align="center">
-Creating a Virtual Machine in Azure: <br/>
-<img src="https://imgur.com/ckUj7LJ.png" height="80%" width="80%" alt="Azure VM Deployment"/>
-<img src="https://imgur.com/pvjGl9G.png" height="80%" width="80%" alt="Azure VM Deployment"/>
-<br />
-Creating a Resource Group in Azure: <br/>
-<img src="https://imgur.com/wb6YuaA.png" height="80%" width="80%" alt="Azure VM Deployment"/>
-<br />
-Configuring Network Security Groups (NSGs):  <br/>
-<img src="https://imgur.com/3Ze8Dbx.png" height="80%" width="80%" alt="NSG Configuration"/>
-<br />
+## The Problem I Was Fixing
 
-<h2>Step-by-Step Deployment Guide</h2>
+Cloud VMs are easy to create, but they can also be easy to expose by mistake. If RDP or SSH is left open to the internet without a plan, the VM becomes a bigger risk than it needs to be.
 
-<h3>1. Setting Up a Virtual Machine</h3>
-<ul>
-    <li>Log into <b>Azure Portal</b> and navigate to **Virtual Machines**.</li>
-    <li>Click **Create VM**, select **Windows Server 2022** or **Ubuntu 20.04**.</li>
-    <li>Choose an appropriate **VM size**, resource group, and region.</li>
-    <li>Set up **Administrator Credentials** for RDP or SSH access.</li>
-    <li>Enable **Public IP Address** (if required) for external access.</li>
-</ul>
+This project helped me practice a safer way to think about access:
 
-<h3>2. Configuring Network Security Groups (NSGs)</h3>
-<ul>
-    <li>Navigate to **Networking** section in the VM settings.</li>
-    <li>Create a **Network Security Group (NSG)**.</li>
-    <li>Define **Inbound & Outbound Rules** for port restrictions.</li>
-    <li>Allow only necessary ports (e.g., **RDP - 3389, SSH - 22**).</li>
-    <li>Restrict all other unauthorized connections.</li>
-</ul>
+1. Know what service needs to be reachable.
+2. Allow only the port needed for the lab.
+3. Keep the rule scoped as tightly as possible.
+4. Test the connection.
+5. Review the traffic and confirm the rule is doing what I expected.
 
-<h3>3. Remote Access & Firewall Configuration</h3>
-<ul>
-    <li>For <b>Windows VM</b>, use **RDP** to connect (Remote Desktop Connection).</li>
-    <li>For <b>Linux VM</b>, use **SSH** via Terminal or PuTTY.</li>
-    <li>Ensure firewall rules align with NSG configurations.</li>
-</ul>
+## Skills I Practiced
 
-<h3>4. Packet Capture & Network Traffic Analysis (Wireshark)</h3>
-<ul>
-    <li>Install **Wireshark** on the VM.</li>
-    <li>Start a **Live Capture** session on the network interface.</li>
-    <li>Analyze incoming/outgoing packets for suspicious activity.</li>
-    <li>Filter by IP addresses, ports, and protocols (e.g., **TCP, UDP, ICMP**).</li>
-</ul>
+- Azure virtual machine deployment
+- Resource group organization
+- Virtual network and subnet basics
+- Network Security Group rule planning
+- RDP and SSH access concepts
+- Packet capture with Wireshark
+- Basic cloud troubleshooting and documentation
 
-<h3>5. Monitoring Logs & Alerts in Azure</h3>
-<ul>
-    <li>Enable **Azure Network Watcher** for real-time logging.</li>
-    <li>Set up **log analytics** to track VM activity.</li>
-    <li>Define alerts for **unauthorized access attempts**.</li>
-</ul>
+## What I Built
 
-<h2>How to Deploy This Project</h2>
-<ol>
-    <li>Set up an <b>Azure Subscription</b> and access the **Azure Portal**.</li>
-    <li>Deploy a **Windows/Linux Virtual Machine**.</li>
-    <li>Configure **Network Security Groups (NSGs)** and enforce firewall policies.</li>
-    <li>Set up **Remote Access (RDP/SSH)** with secure credentials.</li>
-    <li>Install **Wireshark** and monitor real-time network packets.</li>
-    <li>Enable **Azure Monitor & Network Watcher** for security insights.</li>
-</ol>
+| Component | What it was used for |
+| --- | --- |
+| Resource group | Kept the lab resources organized in one place |
+| Virtual machine | Test machine for remote access and traffic review |
+| Virtual network | Provided the private network space for the VM |
+| Subnet | Placed the VM inside a defined network segment |
+| Public IP | Allowed temporary remote access for the lab |
+| Network Security Group | Controlled inbound traffic to the VM |
+| Wireshark | Used to view and filter traffic during testing |
 
-<h2>Conclusion</h2>
-This project demonstrates the **deployment and security hardening** of Azure Virtual Machines using **Network Security Groups (NSGs)** and **Wireshark-based network traffic analysis**. The implementation ensures **secure remote access, controlled network traffic, and proactive monitoring of system activity** to mitigate potential threats.
+## Lab Walkthrough With Screenshots
 
-<!--
-```diff
-- text in red
-+ text in green
-! text in orange
-# text in gray
-@@ text in purple (and bold)@@
+### Creating the Virtual Machine
+
+The first step was building the VM and choosing the basic settings for the lab.
+
+![Azure VM creation screen](https://imgur.com/ckUj7LJ.png)
+
+![Azure VM configuration screen](https://imgur.com/pvjGl9G.png)
+
+### Creating the Resource Group
+
+I used a resource group so the VM, network, public IP, and related resources were grouped together and easier to clean up after the lab.
+
+![Azure resource group screen](https://imgur.com/wb6YuaA.png)
+
+### Reviewing the NSG
+
+The Network Security Group is the part of the lab that controls what inbound traffic is allowed to reach the VM.
+
+![Azure NSG configuration screen](https://imgur.com/3Ze8Dbx.png)
+
+## NSG Rule Plan
+
+For a lab, the rule plan is simple, but the thinking matters. I only want to allow the access needed for testing.
+
+| Scenario | Port | Protocol | Notes |
+| --- | --- | --- | --- |
+| Windows remote access | `3389` | TCP | RDP should be restricted to my current public IP when possible |
+| Linux remote access | `22` | TCP | SSH should be restricted to my current public IP when possible |
+| ICMP testing | N/A | ICMP | Useful for testing, but not always required |
+| Everything else | Any | Any | Should stay denied unless there is a specific reason |
+
+## Validation Checklist
+
+- VM was created inside the correct resource group.
+- VM was attached to the expected virtual network and subnet.
+- Public IP was assigned only for remote access testing.
+- NSG rule allowed the required management port.
+- Unneeded inbound access was not intentionally opened.
+- Remote access was tested.
+- Wireshark was used to observe traffic during testing.
+
+## Supporting Notes
+
+I split the detailed notes into smaller documents so the README stays readable:
+
+| Document | Purpose |
+| --- | --- |
+| [Network design notes](docs/network-design.md) | How the Azure resources fit together |
+| [NSG rule notes](docs/nsg-rule-plan.md) | How I thought about inbound access rules |
+| [Packet analysis notes](docs/packet-analysis-notes.md) | Basic Wireshark filters and what I was looking for |
+| [Validation checklist](docs/validation-checklist.md) | Checks I would run before calling the lab complete |
+| [Troubleshooting notes](docs/troubleshooting-notes.md) | Common issues and where I would look first |
+
+## What I Learned
+
+The biggest takeaway is that Azure networking is more than just giving a VM a public IP. The VM depends on several connected resources, and the NSG is one of the most important places to understand before exposing anything to the internet.
+
+I also got more comfortable thinking through traffic flow: where the connection starts, which rule allows it, where it lands, and how to confirm it with testing.
+
+## What I Would Improve Next
+
+- Restrict management access to a known source IP instead of using broad inbound rules.
+- Use Azure Bastion instead of exposing RDP or SSH directly.
+- Add Azure Network Watcher flow logs for better traffic visibility.
+- Add a second VM to test private subnet-to-subnet communication.
+- Document cleanup steps so unused public IPs and disks do not stay behind.
