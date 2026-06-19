@@ -1,35 +1,24 @@
-# NSG Rule Plan
+# NSG Rule Notes
 
-The Network Security Group was the main security control in this lab. My goal was to allow only the traffic needed for testing and avoid opening unnecessary inbound access.
+The NSG is the main Azure-side filter in this lab. I only need one management port at a time, so the rule should be narrow and temporary.
 
-## The Problem
+## Test Rules
 
-When a VM has a public IP, management ports can become reachable from the internet if the NSG is too open. RDP and SSH are useful for administration, but they should not be casually exposed.
-
-## Rules I Practiced
-
-| Purpose | Direction | Port | Protocol | Source | Action |
+| Use | Direction | Port | Protocol | Source | Action |
 | --- | --- | --- | --- | --- | --- |
-| RDP to Windows VM | Inbound | `3389` | TCP | My public IP when possible | Allow |
-| SSH to Linux VM | Inbound | `22` | TCP | My public IP when possible | Allow |
-| Default inbound protection | Inbound | Any | Any | Internet | Deny by default |
+| RDP to Windows | Inbound | `3389` | TCP | My public IP | Allow |
+| SSH to Linux | Inbound | `22` | TCP | My public IP | Allow |
 
-## How I Would Review a Rule
+The default inbound deny remains in place for traffic that does not match an allow rule.
 
-Before leaving a rule enabled, I would ask:
+## Review Before Testing
 
-- Do I still need this port open?
-- Is the source restricted, or is it open to the internet?
-- Is the priority correct?
-- Does the operating system firewall also allow the traffic?
-- Can I replace public access with Bastion, VPN, or another safer method?
+- Confirm the rule is attached to the correct NIC or subnet.
+- Confirm the source is my current public IP, not `Any`.
+- Check rule priority for conflicts.
+- Open only the port used by the current VM.
+- Confirm the guest firewall has a matching rule.
 
-## Safer Admin Access Notes
+## Cleanup
 
-For a short lab, exposing RDP or SSH can be acceptable if I understand the risk and clean up afterward. For a real environment, I would prefer:
-
-- Azure Bastion
-- VPN access
-- Just-in-time VM access
-- Restricting source IPs
-- Disabling public IP access when not needed
+After the test, I would remove the temporary rule or the public IP. For a longer-lived VM, I would use Bastion, private connectivity, or just-in-time access instead of leaving RDP or SSH exposed.

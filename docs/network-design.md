@@ -1,35 +1,26 @@
 # Network Design Notes
 
-This lab uses a simple Azure setup: one resource group, one virtual machine, one virtual network, one subnet, a public IP for remote access testing, and a Network Security Group to control inbound traffic.
+![Azure VM traffic path](../assets/azure-vm-nsg-lab-map.png)
 
-![Azure VM and NSG lab map](../assets/azure-vm-nsg-lab-map.png)
+The VM is only one part of the connection. Its network interface sits in a subnet inside a virtual network. A public IP makes the interface reachable from outside Azure, while the NSG decides whether the test traffic is allowed through.
 
-## My Goal
+## Connection Path
 
-I wanted to understand how the basic Azure networking pieces connect to each other. A VM is not just a VM by itself. It is attached to a network interface, which sits in a subnet, which belongs to a virtual network. If the VM needs internet-facing access, it also needs a public IP and an NSG rule that allows the traffic.
+1. My computer starts an RDP or SSH connection to the public IP.
+2. Azure evaluates the NSG rules associated with the NIC or subnet.
+3. Allowed traffic reaches the VM network interface.
+4. The guest firewall evaluates the connection again.
+5. RDP or SSH responds only if the service is running and the credentials are valid.
 
-## Resource Layout
+## Resources to Check
 
-| Resource | Why it matters |
+| Resource | Useful question |
 | --- | --- |
-| Resource group | Keeps all lab resources together |
-| Virtual network | Defines the private network space |
-| Subnet | Places the VM inside a smaller network segment |
-| Network interface | Connects the VM to the subnet |
-| Public IP | Allows temporary remote access from outside Azure |
-| NSG | Controls what traffic is allowed in or out |
+| Resource group | Are all lab resources grouped together for cleanup? |
+| Virtual network | Is the address space what I expected? |
+| Subnet | Is the VM on the correct segment? |
+| Network interface | Does it have the correct private and public IP configuration? |
+| NSG | Is it attached where I think it is? |
+| Public IP | Is this still needed after the test? |
 
-## Traffic Flow
-
-1. My computer starts an RDP or SSH session.
-2. The connection goes to the VM public IP.
-3. Azure checks the NSG rule.
-4. If the rule allows the port and source, traffic reaches the network interface.
-5. The VM accepts the connection if the operating system firewall and service are configured correctly.
-
-## Design Notes
-
-- I treated public access as temporary for the lab.
-- I used the NSG as the first place to control inbound traffic.
-- I kept the design small so troubleshooting would be easier.
-- In a stronger setup, I would use Azure Bastion or a VPN instead of exposing management ports directly.
+The design intentionally stays small. A later version would remove the VM public IP and use Bastion, a VPN, or another private management path.

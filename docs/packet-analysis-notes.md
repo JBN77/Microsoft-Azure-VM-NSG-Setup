@@ -1,35 +1,21 @@
-# Packet Analysis Notes
+# Wireshark Notes
 
-I used Wireshark in this lab to get more comfortable looking at traffic instead of only trusting that a connection worked. The point was not deep packet forensics. The point was to connect the Azure NSG rule to real traffic I could observe.
+The capture method was simple: start Wireshark on the VM, begin a controlled RDP, SSH, or ping test, stop the capture, then filter for the expected protocol. This keeps the capture small enough to read.
 
-## My Goal
+## Filters Used
 
-I wanted to answer a few simple questions:
-
-- Do I see traffic when I try to connect?
-- What protocol or port is being used?
-- Is the traffic going to the expected destination?
-- Does the traffic pattern change when access is blocked or allowed?
-
-## Useful Wireshark Filters
-
-| Filter | What it helps show |
+| Filter | Use |
 | --- | --- |
 | `tcp.port == 3389` | RDP traffic |
 | `tcp.port == 22` | SSH traffic |
 | `icmp` | Ping traffic |
-| `ip.addr == x.x.x.x` | Traffic to or from one IP address |
-| `tcp.flags.syn == 1` | New TCP connection attempts |
+| `ip.addr == x.x.x.x` | Traffic to or from one host |
+| `tcp.flags.syn == 1` | TCP connection attempts |
 
-## What I Was Looking For
+## Reading the Result
 
-| Observation | What it can mean |
-| --- | --- |
-| SYN packets with no response | Traffic may be blocked or the service may not be listening |
-| Successful TCP handshake | The port is reachable and responding |
-| Repeated retries | Connectivity or firewall issue |
-| No packets visible | Wrong interface, wrong filter, or traffic is not reaching the machine |
+- A TCP handshake shows that the connection reached a listening service.
+- Repeated SYN packets without a response point to a blocked path or a service that is not listening.
+- No matching packets can mean the wrong capture interface, an overly narrow display filter, or traffic blocked before it reached the VM.
 
-## Notes
-
-Wireshark is most useful when paired with a clear test. For example, I would start a capture, attempt RDP or SSH, stop the capture, and then filter for that port. That makes the capture easier to read.
+Wireshark only shows packets visible to the guest. For Azure-side flow records, I would use Network Watcher or another platform logging option.

@@ -1,121 +1,90 @@
-# Microsoft Azure VM, NSG, and Packet Analysis Lab
+# Azure VM Networking Lab
 
-I built this lab to practice the basics of running a virtual machine in Azure and controlling how traffic reaches it. The main focus was not just "create a VM," but understanding what sits around it: the resource group, virtual network, subnet, public IP, network interface, and Network Security Group rules.
+This lab follows the network path around an Azure virtual machine: resource group, virtual network, subnet, network interface, public IP, and Network Security Group. I used RDP or SSH as the test traffic and Wireshark as a second way to see what happened during a connection attempt.
 
-![Azure VM and NSG lab map](assets/azure-vm-nsg-lab-map.png)
+![Azure VM traffic path](assets/azure-vm-nsg-lab-map.png)
 
-## My Goal
+## What I Wanted to Understand
 
-My goal was to deploy a cloud virtual machine, control remote access with NSG rules, and use packet analysis to understand what traffic looks like when a machine is reachable over the network.
+Creating a VM in the portal is straightforward. The part I wanted to slow down and examine was everything that makes the connection possible:
 
-The specific things I wanted to practice were:
+- Which Azure resource owns the public address?
+- Where does the VM sit inside the private network?
+- Which NSG rule allows the management connection?
+- What changes when a rule is too broad, missing, or attached in the wrong place?
+- What traffic can I see from inside the VM?
 
-- Creating an Azure resource group
-- Deploying a Windows or Linux virtual machine
-- Understanding the virtual network and subnet created with the VM
-- Configuring Network Security Group rules for RDP or SSH
-- Testing remote access
-- Using Wireshark to observe traffic behavior
+## Lab Pieces
 
-## The Problem I Was Fixing
-
-Cloud VMs are easy to create, but they can also be easy to expose by mistake. If RDP or SSH is left open to the internet without a plan, the VM becomes a bigger risk than it needs to be.
-
-This project helped me practice a safer way to think about access:
-
-1. Know what service needs to be reachable.
-2. Allow only the port needed for the lab.
-3. Keep the rule scoped as tightly as possible.
-4. Test the connection.
-5. Review the traffic and confirm the rule is doing what I expected.
-
-## Skills I Practiced
-
-- Azure virtual machine deployment
-- Resource group organization
-- Virtual network and subnet basics
-- Network Security Group rule planning
-- RDP and SSH access concepts
-- Packet capture with Wireshark
-- Basic cloud troubleshooting and documentation
-
-## What I Built
-
-| Component | What it was used for |
+| Resource | Use in this lab |
 | --- | --- |
-| Resource group | Kept the lab resources organized in one place |
-| Virtual machine | Test machine for remote access and traffic review |
-| Virtual network | Provided the private network space for the VM |
-| Subnet | Placed the VM inside a defined network segment |
-| Public IP | Allowed temporary remote access for the lab |
-| Network Security Group | Controlled inbound traffic to the VM |
-| Wireshark | Used to view and filter traffic during testing |
+| Resource group | Keeps the VM and its network resources together |
+| Virtual network | Provides the private address space |
+| Subnet | Places the VM in a defined network segment |
+| Network interface | Connects the VM to the subnet |
+| Public IP | Temporary endpoint for the remote-access test |
+| Network Security Group | Filters inbound traffic before it reaches the VM |
+| Wireshark | Captures traffic seen by the guest operating system |
 
-## Lab Walkthrough With Screenshots
+The traffic path is described in more detail in [docs/network-design.md](docs/network-design.md).
 
-### Creating the Virtual Machine
+## Screenshots From the Build
 
-The first step was building the VM and choosing the basic settings for the lab.
+### VM Creation
 
 ![Azure VM creation screen](https://imgur.com/ckUj7LJ.png)
 
 ![Azure VM configuration screen](https://imgur.com/pvjGl9G.png)
 
-### Creating the Resource Group
-
-I used a resource group so the VM, network, public IP, and related resources were grouped together and easier to clean up after the lab.
+### Resource Group
 
 ![Azure resource group screen](https://imgur.com/wb6YuaA.png)
 
-### Reviewing the NSG
-
-The Network Security Group is the part of the lab that controls what inbound traffic is allowed to reach the VM.
+### Network Security Group
 
 ![Azure NSG configuration screen](https://imgur.com/3Ze8Dbx.png)
 
-## NSG Rule Plan
+## Rule Choices
 
-For a lab, the rule plan is simple, but the thinking matters. I only want to allow the access needed for testing.
+For this lab, management access is the only inbound traffic I need:
 
-| Scenario | Port | Protocol | Notes |
+| Test | Port | Protocol | Source |
 | --- | --- | --- | --- |
-| Windows remote access | `3389` | TCP | RDP should be restricted to my current public IP when possible |
-| Linux remote access | `22` | TCP | SSH should be restricted to my current public IP when possible |
-| ICMP testing | N/A | ICMP | Useful for testing, but not always required |
-| Everything else | Any | Any | Should stay denied unless there is a specific reason |
+| RDP to a Windows VM | `3389` | TCP | My current public IP when possible |
+| SSH to a Linux VM | `22` | TCP | My current public IP when possible |
 
-## Validation Checklist
+I would not leave either rule open to the whole internet after testing. The decision notes are in [docs/nsg-rule-plan.md](docs/nsg-rule-plan.md).
 
-- VM was created inside the correct resource group.
-- VM was attached to the expected virtual network and subnet.
-- Public IP was assigned only for remote access testing.
-- NSG rule allowed the required management port.
-- Unneeded inbound access was not intentionally opened.
-- Remote access was tested.
-- Wireshark was used to observe traffic during testing.
+## How I Checked the Setup
 
-## Supporting Notes
+1. Confirmed the VM was running and attached to the expected subnet.
+2. Confirmed the public IP belonged to the correct network interface.
+3. Checked the NSG association and inbound rule priority.
+4. Attempted the RDP or SSH connection.
+5. Checked the guest firewall and service if the connection failed.
+6. Captured traffic with Wireshark during a controlled test.
 
-I split the detailed notes into smaller documents so the README stays readable:
+The complete checklist is in [docs/validation-checklist.md](docs/validation-checklist.md). Wireshark filters and observations are in [docs/packet-analysis-notes.md](docs/packet-analysis-notes.md).
 
-| Document | Purpose |
-| --- | --- |
-| [Network design notes](docs/network-design.md) | How the Azure resources fit together |
-| [NSG rule notes](docs/nsg-rule-plan.md) | How I thought about inbound access rules |
-| [Packet analysis notes](docs/packet-analysis-notes.md) | Basic Wireshark filters and what I was looking for |
-| [Validation checklist](docs/validation-checklist.md) | Checks I would run before calling the lab complete |
-| [Troubleshooting notes](docs/troubleshooting-notes.md) | Common issues and where I would look first |
+## Troubleshooting Order
 
-## What I Learned
+When the connection does not work, I check the path from outside to inside:
 
-The biggest takeaway is that Azure networking is more than just giving a VM a public IP. The VM depends on several connected resources, and the NSG is one of the most important places to understand before exposing anything to the internet.
+1. VM state and public IP
+2. NSG rule, source, port, and priority
+3. NSG association to the subnet or NIC
+4. Guest operating system firewall
+5. RDP or SSH service inside the VM
 
-I also got more comfortable thinking through traffic flow: where the connection starts, which rule allows it, where it lands, and how to confirm it with testing.
+More detail is in [docs/troubleshooting-notes.md](docs/troubleshooting-notes.md).
 
-## What I Would Improve Next
+## Scope and Limits
 
-- Restrict management access to a known source IP instead of using broad inbound rules.
-- Use Azure Bastion instead of exposing RDP or SSH directly.
-- Add Azure Network Watcher flow logs for better traffic visibility.
-- Add a second VM to test private subnet-to-subnet communication.
-- Document cleanup steps so unused public IPs and disks do not stay behind.
+- This is a small lab, not a production Azure design.
+- The public IP exists for testing; Azure Bastion or private connectivity would be a better long-term approach.
+- The screenshots document VM, resource group, and NSG setup. They do not show Network Watcher flow logs or a Bastion deployment.
+- Wireshark shows traffic visible to the guest. It does not replace Azure platform logging.
+
+## Next Lab
+
+I would add a second VM without a public IP, test private communication between the two machines, and compare the result with an NSG rule that blocks one direction. Afterward, I would delete the resource group and confirm that no public IPs or managed disks were left behind.
